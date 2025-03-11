@@ -32,7 +32,14 @@ function App() {
       <div className={classes.list}>
         {data
           ? Object.keys(data).map((key) => {
-              return <div key={key}>{key}</div>;
+              return (
+                <div
+                  key={key}
+                  className="p-4 hover:bg-gray-700 cursor-pointer transition-colors duration-200"
+                >
+                  {key}
+                </div>
+              );
             })
           : null}
       </div>
