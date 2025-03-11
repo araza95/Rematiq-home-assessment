@@ -1,5 +1,5 @@
+import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import { StrictMode, useEffect, useState } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
 import classes from "./app.module.css";
 
@@ -8,6 +8,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   import.meta.url
 ).toString();
 
+import useFetch from "./hooks/use-fetch.js";
 import "./mvp.css";
 
 interface PDFDatum {
@@ -17,56 +18,23 @@ interface PDFDatum {
 
 type PDFData = Record<string, PDFDatum>;
 
-function usePDFData() {
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>();
-  const [data, setData] = useState<PDFData>();
-
-  useEffect(() => {
-    const inner = async () => {
-      setLoading(true);
-
-      const resp = await fetch("/assets/data.json");
-
-      setData(await resp.json());
-    };
-
-    inner()
-      .then(() => {
-        setLoading(false);
-      })
-      .catch((e) => {
-        if (e instanceof Error) {
-          setError(e.message);
-        } else {
-          setError("Something went wrong");
-        }
-
-        setLoading(false);
-      });
-  }, []);
-
-  return {
-    loading,
-    error,
-    data,
-  };
-}
-
 function App() {
-  const { loading, error, data } = usePDFData();
-  console.log("🚀 ~ App ~ data:", data);
+  const { loading, error, data } = useFetch<PDFData>({
+    url: "/assets/data.json",
+  });
+
+  if (loading) return <div>Loading...</div>;
+
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className={classes.container}>
       <div className={classes.list}>
-        {loading && "Loading..."}
-        {!loading && error && error}
-        {!loading &&
-          data &&
-          Object.keys(data).map((key) => {
-            return <div key={key}>{key}</div>;
-          })}
+        {data
+          ? Object.keys(data).map((key) => {
+              return <div key={key}>{key}</div>;
+            })
+          : null}
       </div>
       <div>
         <Document>
