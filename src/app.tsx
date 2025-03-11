@@ -1,7 +1,6 @@
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
 import { Document, Page, pdfjs } from "react-pdf";
-import classes from "./app.module.css";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
@@ -9,7 +8,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 
 import useFetch from "./hooks/use-fetch.js";
-import "./mvp.css";
+import "../src/app";
 
 interface PDFDatum {
   path: string;
@@ -28,8 +27,8 @@ function App() {
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className={classes.container}>
-      <div className={classes.list}>
+    <div>
+      <div>
         {data
           ? Object.keys(data).map((key) => {
               return (
