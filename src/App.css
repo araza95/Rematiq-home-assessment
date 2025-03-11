@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+@theme {
+  --font-display: "Manrope", system-ui, sans-serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+
+  --color-primary: #f9fafb;
+  --color-primary-text: #1f2937;
+  --color-secondary: #ffffff;
+  --color-secondary-text: #4b5563;
+  --color-accent-primary: #3b82f6;
+  --color-accent-secondary: #10b981;
+  --color-error: #ef4444;
+  --color-success: #22c55e;
+}
+
+#root {
+  width: 100dvw;
+}
+
+@layer base {
+  * {
+    @apply transition-colors duration-200;
+  }
+
+  body {
+    @apply font-sans;
+    @apply bg-primary;
+    @apply text-primary-text;
+  }
+
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+  }
+}
