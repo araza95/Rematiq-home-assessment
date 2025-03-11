@@ -1,0 +1,12 @@
+.container {
+  display: grid;
+  grid-template-columns: 30% 70%;
+  grid-column-gap: 1em;
+  height: 100%;
+}
+
+.container > .list {
+  padding: 2em;
+  border-right: 1px solid gray;
+}
+

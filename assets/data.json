@@ -1,0 +1,143 @@
+{
+  "97ad0e73-6583-4fba-8ecf-a2a7cec94799": {
+    "path": "/assets/BR_Anforderungen_RDC_No.751-2022.pdf",
+    "chunks": [
+      {
+        "content": "II - Technical Dossier, as provided for in Chapter VII of this Resolution;",
+        "pageRange": [
+          12,
+          12
+        ]
+      },
+      {
+        "content": "Article 6 Medical devices falling within risk classes I and II are subject to notification.",
+        "pageRange": [
+          9,
+          9
+        ]
+      },
+      {
+        "content": "Art. 3 Anvisa will also grant notification or registration to families, systems and sets (or kits) of medical devices.",
+        "pageRange": [
+          2,
+          2
+        ]
+      },
+      {
+        "content": "§ 1 The statement that it deals with item III shall contain the social reason and full address of the legal manufacturer and the requesting company, the express authorization for the requesting company to represent and market its products in Brazil; And the statement about knowledge and compliance with the requirements of Good Manufacturing Practices of Health Products established in the Resolution of the Collegiate Board - RDC No. 665, of March 30, 2022, or regulation that will replace it.",
+        "pageRange": [
+          13,
+          13
+        ]
+      },
+      {
+        "content": "Rule 18\nAll devices manufactured by the use of cells, tissues, or their non-viable derivatives (without metabolism or multiplication capacity) or made non-viable, are classified in Class IV, unless they are devices intended to come into contact solely with intact skin. This rule does not apply to advanced therapy products, which are treated by a specific regulation.",
+        "pageRange": [
+          34,
+          35
+        ]
+      },
+      {
+        "content": "Art. 16. Changes to information presented in the medical device notification or registration process are classified under:\nI - amendment of approval required;\nII - Immediate implementation change; and\nIII - Non-reportable change.",
+        "pageRange": [
+          14,
+          14
+        ]
+      }
+    ]
+  },
+  "82a8733c-d2b8-40d0-903f-1f04bce49347": {
+    "path": "/assets/JP_MHLW_MO_No.169-2004.pdf",
+    "chunks": [
+      {
+        "content": "(V) Requirements pertaining to the installation of products",
+        "pageRange": [
+          8,
+          8
+        ]
+      },
+      {
+        "content": "2 In the procedures documented pursuant to the provisions of the preceding paragraph, the manufacturer, etc. shall, based on the provisions of laws and regulations, specify the scope of ensuring traceability and the records to be kept for each product and component part, etc.\n(Securing Traceability of Products pertaining to Implantable Medical Devices)",
+        "pageRange": [
+          27,
+          28
+        ]
+      },
+      {
+        "content": "4 The manufacturer, etc. shall retain at least a part of the Quality Control and Supervision Document or a copy thereof for the period specified in Article 67.",
+        "pageRange": [
+          9,
+          9
+        ]
+      },
+      {
+        "content": "三 Take necessary measures to obtain the results achieved by the process and to maintain the effectiveness of the process.",
+        "pageRange": [
+          6,
+          6
+        ]
+      },
+      {
+        "content": "(19) the term \"remanufactured single-use medical device\" as used in this Ministerial Ordinance means a single-use medical device (meaning a medical device that is intended to be used one-time). The same shall apply hereinafter.) Remanufacturing (for the purpose of manufacturing and selling new medical devices after they have been used, inspection, disassembly, and Cleaning, sterilization and other necessary processing. The same shall apply hereinafter.) It means something that has been done.",
+        "pageRange": [
+          4,
+          4
+        ]
+      },
+      {
+        "content": "(2) a management supervisor shall grant the management responsible person responsibility and authority for the following operations: Ensure that processes are established, documented, implemented and maintained, and that their effectiveness is maintained.\n(II) the effectiveness of the quality management and supervision system and the need for improvement shall be reported to the management and supervisors.\n (III) to improve awareness of the provisions of laws and regulations and requirements related to the quality management and supervision system at all facilities.",
+        "pageRange": [
+          11,
+          11
+        ]
+      }
+    ]
+  },
+  "22d4dd7d-7bd5-4585-8ab1-bf879ac2d897": {
+    "path": "/assets/YY T 0944-2014 Medical endoscopes - Endotherapy device - Separating forceps.pdf",
+    "chunks": [
+      {
+        "content": "4.1.3 Dissolved precipitate from polymer materials in contact with patients",
+        "pageRange": [
+          6,
+          6
+        ]
+      },
+      {
+        "content": "4.1.3.4 Potassium permanganate-reducing substances: The difference in consumption shall be less than 2.0mL when compared to the blank control solution of equal volume from the same batch.",
+        "pageRange": [
+          6,
+          6
+        ]
+      },
+      {
+        "content": "4.1.5 Consistency between surface and internal materials\n For components claimed by the manufacturer to be made of metallic materials, the surface material shall be consistent with the internal material. If surface coating is deemed necessary, the manufacturer shall provide corresponding coating requirements and test methods",
+        "pageRange": [
+          6,
+          6
+        ]
+      },
+      {
+        "content": "4.1.2 Biocompatibility\nMaterials in contact with patients shall be evaluated for biosafety following the principles and requirements specified in GB/T 16886.1 to demonstrate their good biocompatibility.\nFor biological evaluation, the results of biological tests may be taken into account, and the test items shall be selected according to the guidelines given in GB/T 16886.1. All tests shall give priority to the relevant standards of GB/T 16886 as reference standards.\nFor materials previously proven to be applicable, if it can be demonstrated that subsequent manufacturing processes do not pose a biosafety hazard, repeated biological tests may be omitted.",
+        "pageRange": [
+          5,
+          6
+        ]
+      },
+      {
+        "content": "When the forceps jaws open at an angle of 30° (or 70% of the maximum opening angle if 70% is less than 30°), apply a force (fi) of 5N~15N to the handle, with intervals not exceeding 3N. Record the opening force (fo) generated at the front ends of the jaws, perpendicular to the bisector of the opening angle of the forceps jaws. Then, fit the collected data using the least squares method to obtain the value of fo/fi, which is the transmission coefficient of opening force.",
+        "pageRange": [
+          12,
+          12
+        ]
+      },
+      {
+        "content": "4.8.6 Instructions for environmental protection shall be included:\n——Indicate any risks related to wastes, residues and their disposal at the end of the service life of the product;\n——Provide recommendations to minimize these risks.",
+        "pageRange": [
+          9,
+          9
+        ]
+      }
+    ]
+  }
+}
