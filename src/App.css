@@ -16,6 +16,8 @@
   --color-accent-secondary: #10b981;
   --color-error: #ef4444;
   --color-success: #22c55e;
+
+  --radix-collapsible-content-height: 0px;
 }
 
 #root {
@@ -30,13 +32,47 @@
   body {
     @apply font-sans;
     @apply bg-primary;
-    background-color: var(--color-background);
   }
 
   h1,
   h2,
-  h3 {
+  h3,
+  p {
     @apply font-display;
+  }
+}
+
+@layer utilities {
+  .animate-collapsible-down {
+    overflow: hidden;
+    animation: collapsibleDown 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .animate-collapsible-up {
+    overflow: hidden;
+    animation: collapsibleUp 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  @keyframes collapsibleDown {
+    from {
+      height: 0;
+      opacity: 0;
+    }
+    to {
+      height: var(--radix-collapsible-content-height);
+      opacity: 1;
+    }
+  }
+
+  @keyframes collapsibleUp {
+    from {
+      height: var(--radix-collapsible-content-height);
+      opacity: 1;
+    }
+    to {
+      height: 0;
+      opacity: 0;
+    }
   }
 }
 
