@@ -14,7 +14,16 @@ import { GoSidebarExpand } from "react-icons/go";
 import PrimaryButton from "../UI/Buttons/primary-button";
 
 // Custom Hook Imports
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@radix-ui/react-collapsible";
+import { PDF_LISTS_PATH } from "../../constants";
+import usePdfFetch from "../../hooks/use-fetch";
 import { useDimension } from "../../hooks/useWindow";
+import { PDFData } from "../../types/pdf-response";
+import { usePDFStore } from "../../store/pdf-store";
 
 interface ISidebarProps {
   className?: string;
@@ -28,7 +37,14 @@ interface ISidebarProps {
  * @returns Sidebar Component
  */
 const Sidebar: FunctionComponent<ISidebarProps> = () => {
+  // Global Store Hooks
   const { isCollapsed, toggleSidebar, autoCollapse } = useSidebarStore();
+  const { setSelectedPDF, selectChunk } = usePDFStore();
+
+  // Custom Hooks
+  const { data: pdfData } = usePdfFetch<PDFData>({
+    url: PDF_LISTS_PATH,
+  });
 
   const { width } = useDimension();
 
@@ -68,16 +84,29 @@ const Sidebar: FunctionComponent<ISidebarProps> = () => {
 
       {/* Uploaded PDFs */}
       <div className="flex-1 overflow-y-auto">
-        {["PDF 1", "PDF 2", "PDF 3", "PDF 4", "PDF 5"].map((pdf, index) => (
-          <div
-            key={index}
-            className="p-4 hover:bg-gray-700 cursor-pointer transition-colors duration-200"
-          >
-            <p>{pdf}</p>
-          </div>
-        ))}
+        {pdfData &&
+          Object.entries(pdfData).map(([id, data]) => (
+            <Collapsible key={id}>
+              <CollapsibleTrigger
+                onClick={() => setSelectedPDF(data)}
+                className="w-full text-left p-4 hover:bg-gray-700"
+              >
+                {id}
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                {data.chunks.map((chunk, index) => (
+                  <div
+                    key={index}
+                    className="hover:bg-gray-600 p-2 cursor-pointer"
+                    onClick={() => selectChunk(chunk)}
+                  >
+                    {chunk.content.substring(0, 100)}
+                  </div>
+                ))}
+              </CollapsibleContent>
+            </Collapsible>
+          ))}
       </div>
-
       {/* Logout Button */}
       <div className="p-4 border-t border-gray-700">
         <button className="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors duration-200">

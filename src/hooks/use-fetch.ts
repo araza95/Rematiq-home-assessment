@@ -5,7 +5,6 @@ type FetchResult<T> = {
   data: T | null;
   setData: React.Dispatch<React.SetStateAction<T | null>>;
   error: string | null;
-  onSuccess: (data: T) => void;
 };
 
 /**
@@ -56,11 +55,7 @@ const useFetch = <T>({ url }: { url: string }): FetchResult<T> => {
     return () => abortController.abort();
   }, [url]);
 
-  const onSuccess = (data: T) => {
-    setData(data);
-  };
-
-  return { loading, error, data, setData, onSuccess };
+  return { loading, error, data, setData };
 };
 
 export default useFetch;
