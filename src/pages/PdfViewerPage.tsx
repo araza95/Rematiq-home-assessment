@@ -26,7 +26,6 @@ import "@react-pdf-viewer/page-navigation/lib/styles/index.css";
 import "@react-pdf-viewer/search/lib/styles/index.css";
 
 import { PdfLoadProgress } from "../components/Loaders/PDFLoader";
-import { highlightMatchingText } from "../utils/app/highlight-matching-text";
 import { extractPdfTextContent } from "../utils/helpers/extract-pdf-text-content";
 
 /**
@@ -48,6 +47,7 @@ const PdfViewer: FunctionComponent = () => {
   const [pdfLocalData, setPdfLocalData] = useState<
     {
       pageNumber: number;
+      normalizedToOriginalMap: number[];
       content: string;
     }[]
   >([]);
@@ -86,28 +86,36 @@ const PdfViewer: FunctionComponent = () => {
     const data: {
       pageNumber: number;
       content: string;
+      normalizedToOriginalMap: number[];
     }[] = [];
 
     const numPages = doc.numPages;
+    const normalizedToOriginalMap: number[] = [];
+    let originalText: string = "";
 
     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
       const content = await (await doc.getPage(pageNum)).getTextContent();
-      let originalText: string = "";
 
       content.items.forEach((item) => {
-        originalText += item.str + " ";
+        const text = item.str;
+        const offset = originalText.length;
+        originalText += text;
+        for (let i = 0; i < text.length; i++) {
+          if (!/\s/.test(text[i])) {
+            normalizedToOriginalMap.push(offset + i);
+          }
+        }
       });
 
       // Clean the text by removing potential page number artifacts at the beginning
       // This regex looks for a number (potentially the page number) at the start of the text
       // and removes it if found
-      const cleanedText = originalText
-        .replace(/^\s*\d+\s*/, "")
-        .replace(/\s+/g, "");
+      const normalizedText = originalText.replace(/\s+/g, "");
 
       data.push({
         pageNumber: pageNum,
-        content: cleanedText,
+        content: normalizedText,
+        normalizedToOriginalMap,
       });
 
       setPdfLocalData(data);
@@ -123,13 +131,14 @@ const PdfViewer: FunctionComponent = () => {
       if (!selectedChunk?.content || !pdfTextContent.normalizedText) return;
       console.log(
         "🚀 ~ highlightMatch ~ selectedChunk?.content:",
-        selectedChunk,
         pdfLocalData
       );
 
       const found = pdfLocalData.find(
         (item) => item.pageNumber === selectedChunk.pageRange[0]
       );
+
+      if (!found) return;
 
       const formatSelectedContent = selectedChunk.content
         .replace(/^\s*\d+\s*/, "")
@@ -144,10 +153,29 @@ const PdfViewer: FunctionComponent = () => {
 
       if (!startIndex) return;
 
-      const endIndex =
-        startIndex !== -1 ? startIndex + formatSelectedContent.length : -1;
+      const startOriginal = found.normalizedToOriginalMap[startIndex];
 
-      console.log({ startIndex, endIndex });
+      const endOriginal =
+        found.normalizedToOriginalMap[
+          startIndex + formatSelectedContent.length - 1
+        ];
+
+      // Extract the exact matching substring from the original text.
+      const exactMatch = pdfTextContent.originalText.substring(
+        startOriginal,
+        endOriginal + 1
+      );
+
+      console.log("inner  exact match", exactMatch);
+      console.log("inner ", startIndex, endOriginal);
+
+      // searchPluginInstance.clearHighlights();
+
+      const match = await searchPluginInstance.highlight(exactMatch);
+      if (match.length > 0) {
+        searchPluginInstance.jumpToMatch(0);
+      }
+      console.log("🚀 ~ highlightMatch ~ match:", match);
 
       // await highlightMatchingText({
       //   searchPluginInstance,
