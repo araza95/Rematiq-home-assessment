@@ -55,6 +55,9 @@ export const highlightMatchingText = async ({
     endOriginal + 1
   );
 
+  console.log("inner - outside exact match", exactMatch);
+  console.log("inner - outside", startIndex, endOriginal);
+
   // Clear any previous highlights, apply new highlighting, and jump to the match.
   searchPluginInstance.clearHighlights();
   const matches = await searchPluginInstance.highlight(exactMatch);

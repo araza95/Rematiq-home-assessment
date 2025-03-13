@@ -44,6 +44,15 @@ export interface PdfTextContentData {
  */
 const PdfViewer: FunctionComponent = () => {
   const { selectedPDF, selectedChunk } = usePDFStore();
+
+  const [pdfLocalData, setPdfLocalData] = useState<
+    {
+      pageNumber: number;
+      content: string;
+    }[]
+  >([]);
+  console.log("🚀 ~ pdfLocalData:", pdfLocalData);
+
   const [pdfTextContent, setPdfTextContent] = useState<PdfTextContentData>({
     originalText: "",
     normalizedText: "",
@@ -74,6 +83,36 @@ const PdfViewer: FunctionComponent = () => {
     doc,
     file,
   }: DocumentLoadEvent): Promise<void> => {
+    const data: {
+      pageNumber: number;
+      content: string;
+    }[] = [];
+
+    const numPages = doc.numPages;
+
+    for (let pageNum = 1; pageNum <= numPages; pageNum++) {
+      const content = await (await doc.getPage(pageNum)).getTextContent();
+      let originalText: string = "";
+
+      content.items.forEach((item) => {
+        originalText += item.str + " ";
+      });
+
+      // Clean the text by removing potential page number artifacts at the beginning
+      // This regex looks for a number (potentially the page number) at the start of the text
+      // and removes it if found
+      const cleanedText = originalText
+        .replace(/^\s*\d+\s*/, "")
+        .replace(/\s+/g, "");
+
+      data.push({
+        pageNumber: pageNum,
+        content: cleanedText,
+      });
+
+      setPdfLocalData(data);
+    }
+
     const extractedContent = await extractPdfTextContent({ doc: doc, file });
     setPdfTextContent(extractedContent);
   };
@@ -82,14 +121,42 @@ const PdfViewer: FunctionComponent = () => {
   useEffect(() => {
     const highlightMatch = async () => {
       if (!selectedChunk?.content || !pdfTextContent.normalizedText) return;
-      await highlightMatchingText({
-        searchPluginInstance,
-        pdfTextContent,
-        selectedText: selectedChunk.content,
-      });
+      console.log(
+        "🚀 ~ highlightMatch ~ selectedChunk?.content:",
+        selectedChunk,
+        pdfLocalData
+      );
+
+      const found = pdfLocalData.find(
+        (item) => item.pageNumber === selectedChunk.pageRange[0]
+      );
+
+      const formatSelectedContent = selectedChunk.content
+        .replace(/^\s*\d+\s*/, "")
+        .replace(/\s+/g, "");
+
+      console.log(
+        "found a match",
+        found ? found.content.includes(formatSelectedContent) : false
+      );
+
+      const startIndex = found?.content.indexOf(formatSelectedContent);
+
+      if (!startIndex) return;
+
+      const endIndex =
+        startIndex !== -1 ? startIndex + formatSelectedContent.length : -1;
+
+      console.log({ startIndex, endIndex });
+
+      // await highlightMatchingText({
+      //   searchPluginInstance,
+      //   pdfTextContent,
+      //   selectedText: selectedChunk.content,
+      // });
     };
     highlightMatch();
-  }, [selectedChunk, pdfTextContent, searchPluginInstance]);
+  }, [selectedChunk, pdfTextContent, searchPluginInstance, pdfLocalData]);
 
   if (!selectedPDF) return <div>Select a PDF to view</div>;
 

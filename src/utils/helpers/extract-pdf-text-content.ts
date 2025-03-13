@@ -46,12 +46,7 @@ export const extractPdfTextContent = async ({
   const normalizedToOriginalMap: number[] = [];
 
   // Loop through each page's content.
-  pageContents.forEach((page, pageIndex) => {
-    // Insert a space between pages for continuity.
-    if (pageIndex > 0) {
-      originalText += " ";
-    }
-
+  pageContents.forEach((page) => {
     page.items.forEach((_) => {
       const item = _ as ExtendedTextItemType;
       const text = item.str;
