@@ -1,5 +1,8 @@
 # PDF viewer coding challenge
 
+## Task road 
+![image](https://github.com/user-attachments/assets/1b423a02-6289-4839-bcf7-a7c249d5943e)
+
 ## Overview
 
 This coding challenge is designed to assess your ability to integrate and manipulate PDFs within a web application. Your task is to create an app with a list of PDFs with specific paragraphs from those PDFs, and a PDF viewer that displays the corresponding page from the selected PDF with the paragraph highlighted.
@@ -9,6 +12,7 @@ This coding challenge is designed to assess your ability to integrate and manipu
 1. Clone the repository.
 2. Install dependencies with `npm install`.
 3. Run the Vite dev server with `npm run dev`.
+   
 
 ## Requirements
 
