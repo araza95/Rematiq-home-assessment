@@ -62,17 +62,12 @@ const PdfViewer: React.FC = (): JSX.Element => {
 
   const { isDocumentLoaded } = usePDFStore();
 
-   // Create a temporary loading state when document first loads
+  // Create a temporary loading state when document first loads
   // This will simulate a 2-second processing time for demonstration
   useEffect(() => {
     if (selectedPDF && !isDocumentLoaded) {
-      // Set a timer to show the processing loader for 2 seconds
-      const timer = setTimeout(() => {
-        // After 2 seconds, you can update the isDocumentLoaded state if needed
-        // This assumes you have a method to update this state in your store
-        // If you don't have this method, you'll need to add it to your store
-      }, 2000);
-      
+      const timer = setTimeout(() => {}, 3000);
+
       return () => clearTimeout(timer);
     }
   }, [selectedPDF, isDocumentLoaded]);
@@ -91,9 +86,11 @@ const PdfViewer: React.FC = (): JSX.Element => {
 
   return (
     <div className="flex flex-col h-full relative">
-        {/* DocumentProcessingLoader will only show when isDocumentLoaded is false */}
-        {!isDocumentLoaded && selectedPDF && (
-        <DocumentProcessingLoader pdfId={selectedPDF.path || selectedPDF.path.split('/').pop()} />
+      {/* DocumentProcessingLoader will only show when isDocumentLoaded is false */}
+      {!isDocumentLoaded && selectedPDF && (
+        <DocumentProcessingLoader
+          pdfId={selectedPDF.path || selectedPDF.path.split("/").pop()}
+        />
       )}
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
         <PDFHeader CurrentPageLabel={CurrentPageLabel} />
