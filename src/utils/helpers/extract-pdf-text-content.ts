@@ -35,23 +35,48 @@ export const extractPdfTextContent = async ({
 }: DocumentLoadEvent): Promise<PdfTextContentData> => {
   const pageNumbers = Array.from({ length: doc.numPages }, (_, i) => i + 1);
 
+  console.log("🚀 ~ pageNumbers:", pageNumbers);
+
   const pageContents = await Promise.all(
     pageNumbers.map(async (pageNumber) => {
       const page = await doc.getPage(pageNumber);
-      return page.getTextContent();
+      //   return page.getTextContent();
+      const textContent = await page.getTextContent();
+
+      // Detect and remove page numbers
+      const filteredItems = textContent.items.filter((_, index) => {
+        const item = _ as ExtendedTextItemType;
+
+        // Check first item
+        if (index === 0 && item.str.trim() === pageNumber.toString()) {
+          return false;
+        }
+
+        // Check last item
+        if (
+          index === textContent.items.length - 1 &&
+          item.str.trim() === pageNumber.toString()
+        ) {
+          return false;
+        }
+
+        return true;
+      });
+
+      return { ...textContent, items: filteredItems };
     })
   );
 
+  console.log("🚀 ~ pageContents:", pageContents);
+
+  // Initialize the original text.
   let originalText: string = "";
+
+  // Array to map normalized text positions to original positions.
   const normalizedToOriginalMap: number[] = [];
 
   // Loop through each page's content.
   pageContents.forEach((page, pageIndex) => {
-    // Insert a space between pages for continuity.
-    if (pageIndex > 0) {
-      originalText += " ";
-    }
-
     page.items.forEach((_) => {
       const item = _ as ExtendedTextItemType;
       const text = item.str;
@@ -64,10 +89,17 @@ export const extractPdfTextContent = async ({
         }
       }
     });
+
+    // Add space between pages but not page numbers
+    if (pageIndex < pageContents.length - 1) {
+      originalText += " ";
+    }
   });
 
   // Create normalized text by removing all whitespace.
   const normalizedText = originalText.replace(/\s+/g, "");
+
+  console.log("🚀 ~ normalizedText:", normalizedText);
 
   return {
     originalText,

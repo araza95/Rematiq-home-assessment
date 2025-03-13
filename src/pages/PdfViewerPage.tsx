@@ -1,3 +1,10 @@
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  Fragment,
+  FunctionComponent,
+} from "react";
 import {
   DocumentLoadEvent,
   ScrollMode,
@@ -10,24 +17,17 @@ import {
 import type { RenderCurrentPageLabelProps } from "@react-pdf-viewer/page-navigation";
 import { pageNavigationPlugin } from "@react-pdf-viewer/page-navigation";
 import { OnHighlightKeyword, searchPlugin } from "@react-pdf-viewer/search";
-import {
-  Fragment,
-  FunctionComponent,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
 import { usePDFStore } from "../store/pdf-store";
 
 // Style Imports
 import "@react-pdf-viewer/core/lib/styles/index.css";
 import "@react-pdf-viewer/default-layout/lib/styles/index.css";
-import "@react-pdf-viewer/page-navigation/lib/styles/index.css";
 import "@react-pdf-viewer/search/lib/styles/index.css";
+import "@react-pdf-viewer/page-navigation/lib/styles/index.css";
 
 import { PdfLoadProgress } from "../components/Loaders/PDFLoader";
-import { highlightMatchingText } from "../utils/app/highlight-matching-text";
 import { extractPdfTextContent } from "../utils/helpers/extract-pdf-text-content";
+import { highlightMatchingText } from "../utils/app/highlight-matching-text";
 
 /**
  * Interface representing the extracted PDF text content and mapping.

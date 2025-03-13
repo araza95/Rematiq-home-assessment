@@ -125,6 +125,13 @@
         ]
       },
       {
+        "content": "For materials previously proven to be applicable, if it can be demonstrated that subsequent manufacturing processes do not pose a biosafety hazard, repeated biological tests may be omitted.",
+        "pageRange": [
+          5,
+          6
+        ]
+      },
+      {
         "content": "When the forceps jaws open at an angle of 30° (or 70% of the maximum opening angle if 70% is less than 30°), apply a force (fi) of 5N~15N to the handle, with intervals not exceeding 3N. Record the opening force (fo) generated at the front ends of the jaws, perpendicular to the bisector of the opening angle of the forceps jaws. Then, fit the collected data using the least squares method to obtain the value of fo/fi, which is the transmission coefficient of opening force.",
         "pageRange": [
           12,
