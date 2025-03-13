@@ -31,7 +31,7 @@ import { PDF_LISTS_PATH } from "../../constants";
 import usePdfFetch from "../../hooks/use-fetch";
 import { useDimension } from "../../hooks/useWindow";
 import { PDFChunk, PDFData, PDFDatum } from "../../types/pdf-response";
-
+import { Tooltip } from "../Tooltip";
 interface ISidebarProps {
   className?: string;
 }
@@ -49,8 +49,13 @@ const Sidebar: FunctionComponent<ISidebarProps> = () => {
 
   // Global Store Hooks
   const { isCollapsed, toggleSidebar, autoCollapse } = useSidebarStore();
-  const { setSelectedPDF, selectChunk, selectedChunk, selectedPDF } =
-    usePDFStore();
+  const {
+    setSelectedPDF,
+    selectChunk,
+    selectedChunk,
+    selectedPDF,
+    isDocumentLoaded,
+  } = usePDFStore();
 
   // Custom Hooks
   const { data: pdfData } = usePdfFetch<PDFData>({
@@ -75,9 +80,11 @@ const Sidebar: FunctionComponent<ISidebarProps> = () => {
   // Handle chunk selection with memoized callback
   const handleChunkSelect = useCallback(
     (chunk: PDFChunk) => {
+      if (!isDocumentLoaded) return;
+
       selectChunk(chunk);
     },
-    [selectChunk]
+    [selectChunk, isDocumentLoaded]
   );
 
   // Memoize PDF list rendering to prevent unnecessary rerenders
@@ -124,23 +131,33 @@ const Sidebar: FunctionComponent<ISidebarProps> = () => {
                 const isChunkSelected =
                   selectedChunk && chunk.content === selectedChunk.content;
 
+                const isDisabled = !isDocumentLoaded && selectedPDF === data;
+
                 return (
-                  <button
+                  <Tooltip
                     key={index}
-                    className={cn(
-                      "cursor-pointer w-full text-left py-2 px-3 text-xs",
-                      "transition-all duration-200 rounded-md",
-                      "hover:bg-gray-700/60 hover:shadow-inner",
-                      isChunkSelected
-                        ? "bg-emerald-500/20 text-emerald-200 font-medium"
-                        : "text-slate-300 hover:text-blue-200"
-                    )}
-                    onClick={() => handleChunkSelect(chunk)}
+                    content={
+                      isDisabled ? "Document is processing, please wait" : ""
+                    }
+                    show={isDisabled}
                   >
-                    <div className="truncate">
-                      {chunk.content.substring(0, 50)}...
-                    </div>
-                  </button>
+                    <button
+                      key={index}
+                      className={cn(
+                        "cursor-pointer w-full text-left py-2 px-3 text-xs",
+                        "transition-all duration-200 rounded-md",
+                        "hover:bg-gray-700/60 hover:shadow-inner",
+                        isChunkSelected
+                          ? "bg-emerald-500/20 text-emerald-200 font-medium"
+                          : "text-slate-300 hover:text-blue-200"
+                      )}
+                      onClick={() => handleChunkSelect(chunk)}
+                    >
+                      <div className="truncate">
+                        {chunk.content.substring(0, 50)}...
+                      </div>
+                    </button>
+                  </Tooltip>
                 );
               })}
             </div>

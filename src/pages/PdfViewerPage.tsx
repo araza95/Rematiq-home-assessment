@@ -1,5 +1,5 @@
 // React Imports
-import React, { JSX } from "react";
+import React, { JSX, useEffect } from "react";
 
 // React PDF Viewer Core Imports
 import {
@@ -22,6 +22,8 @@ import PDFHeader from "../components/PdfViewer/PDFHeader";
 
 // Hook Imports
 import { usePdfViewer } from "../hooks/use-pdf-viewer";
+import { usePDFStore } from "../store/pdf-store";
+import DocumentProcessingLoader from "../components/Loaders/DocumentProcessingLoader";
 
 /**
  * @description A React component that renders a PDF viewer with integrated plugin support and responsive display features.
@@ -58,6 +60,23 @@ const PdfViewer: React.FC = (): JSX.Element => {
     setRenderRange,
   } = usePdfViewer();
 
+  const { isDocumentLoaded } = usePDFStore();
+
+   // Create a temporary loading state when document first loads
+  // This will simulate a 2-second processing time for demonstration
+  useEffect(() => {
+    if (selectedPDF && !isDocumentLoaded) {
+      // Set a timer to show the processing loader for 2 seconds
+      const timer = setTimeout(() => {
+        // After 2 seconds, you can update the isDocumentLoaded state if needed
+        // This assumes you have a method to update this state in your store
+        // If you don't have this method, you'll need to add it to your store
+      }, 2000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [selectedPDF, isDocumentLoaded]);
+
   // If no PDF is selected, show empty state
   if (!selectedPDF) {
     return (
@@ -71,7 +90,11 @@ const PdfViewer: React.FC = (): JSX.Element => {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
+        {/* DocumentProcessingLoader will only show when isDocumentLoaded is false */}
+        {!isDocumentLoaded && selectedPDF && (
+        <DocumentProcessingLoader pdfId={selectedPDF.path || selectedPDF.path.split('/').pop()} />
+      )}
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
         <PDFHeader CurrentPageLabel={CurrentPageLabel} />
         <div className="flex-1 overflow-hidden w-[85%] m-auto">

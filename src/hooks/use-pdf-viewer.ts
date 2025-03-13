@@ -53,10 +53,8 @@ import { PageDataService } from "../utils/app/pdf-utils";
  */
 export const usePdfViewer = (): usePdfViewerHook => {
   // Get PDF-related data from global store
-  const { selectedPDF, selectedChunk } = usePDFStore();
-
-  // Track whether the document has finished loading
-  const [isDocumentLoaded, setIsDocumentLoaded] = useState<boolean>(false);
+  const { selectedPDF, selectedChunk, setDocumentLoaded, isDocumentLoaded } =
+    usePDFStore();
 
   // Store extracted page data from the PDF
   const [pdfLocalData, setPdfLocalData] = useState<PageData[]>([]);
@@ -102,13 +100,13 @@ export const usePdfViewer = (): usePdfViewerHook => {
         setPdfLocalData(data);
 
         // Mark the document as successfully loaded
-        setIsDocumentLoaded(true);
+        setDocumentLoaded(true);
       } catch (error) {
         // Log any errors that occur during loading
         console.error("Error loading PDF document:", error);
 
         // Mark the document as not loaded
-        setIsDocumentLoaded(false);
+        setDocumentLoaded(false);
       }
     },
     [] // No dependencies means this function is created once
