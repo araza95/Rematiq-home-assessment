@@ -1,30 +1,36 @@
 // React Imports
-import { FunctionComponent, useEffect } from "react";
+import {
+  FunctionComponent,
+  useCallback,
+  useMemo,
+  useState,
+  useEffect,
+} from "react";
 
 // Store Imports
 import { useSidebarStore } from "../../store/sidebar-store";
+import { usePDFStore } from "../../store/pdf-store";
 
 // Util Imports
 import { cn } from "../../utils/tailwind-cn";
 
 // React Icon Imports
 import { GoSidebarExpand } from "react-icons/go";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, LogOut } from "lucide-react";
 
 // Component Imports
 import PrimaryButton from "../UI/Buttons/primary-button";
-
-// Custom Hook Imports
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@radix-ui/react-collapsible";
+
+// Constants & Custom Hook Imports
 import { PDF_LISTS_PATH } from "../../constants";
 import usePdfFetch from "../../hooks/use-fetch";
 import { useDimension } from "../../hooks/useWindow";
-import { PDFData } from "../../types/pdf-response";
-import { usePDFStore } from "../../store/pdf-store";
+import { PDFChunk, PDFData, PDFDatum } from "../../types/pdf-response";
 
 interface ISidebarProps {
   className?: string;
@@ -38,9 +44,13 @@ interface ISidebarProps {
  * @returns Sidebar Component
  */
 const Sidebar: FunctionComponent<ISidebarProps> = () => {
+  // Track which PDF is expanded
+  const [openPdfId, setOpenPdfId] = useState<string | null>(null);
+
   // Global Store Hooks
   const { isCollapsed, toggleSidebar, autoCollapse } = useSidebarStore();
-  const { setSelectedPDF, selectChunk } = usePDFStore();
+  const { setSelectedPDF, selectChunk, selectedChunk, selectedPDF } =
+    usePDFStore();
 
   // Custom Hooks
   const { data: pdfData } = usePdfFetch<PDFData>({
@@ -48,6 +58,104 @@ const Sidebar: FunctionComponent<ISidebarProps> = () => {
   });
 
   const { width } = useDimension();
+
+  // Handle PDF selection and toggle expansion
+  const handlePdfSelect = useCallback(
+    (
+      id: string,
+
+      data: PDFDatum
+    ) => {
+      setSelectedPDF(data);
+      setOpenPdfId((prevId) => (prevId === id ? null : id));
+    },
+    [setSelectedPDF]
+  );
+
+  // Handle chunk selection with memoized callback
+  const handleChunkSelect = useCallback(
+    (chunk: PDFChunk) => {
+      selectChunk(chunk);
+    },
+    [selectChunk]
+  );
+
+  // Memoize PDF list rendering to prevent unnecessary rerenders
+  const pdfList = useMemo(() => {
+    if (!pdfData || Object.entries(pdfData).length === 0) return null;
+
+    return Object.entries(pdfData).map(([id, data]) => {
+      const isSelected =
+        selectedPDF &&
+        id === Object.keys(pdfData).find((key) => pdfData[key] === selectedPDF);
+
+      return (
+        <Collapsible
+          key={id}
+          className="group w-full mb-2"
+          open={openPdfId === id}
+          onOpenChange={(open) => {
+            if (open) setOpenPdfId(id);
+            else setOpenPdfId(null);
+          }}
+        >
+          <CollapsibleTrigger
+            onClick={() => handlePdfSelect(id, data)}
+            className={cn(
+              "cursor-pointer flex items-center justify-between w-full px-4 py-3",
+              "text-sm font-medium transition-all duration-300 rounded-lg",
+              "hover:bg-gray-700/50 group-hover:shadow-md",
+              isSelected
+                ? "bg-blue-500/20 text-blue-50 font-semibold"
+                : "text-slate-200 hover:text-white"
+            )}
+          >
+            <span className="truncate">{id}</span>
+            <ChevronDown
+              className={cn(
+                "h-4 w-4 transition-transform duration-300 ease-out",
+                openPdfId === id ? "rotate-180 text-blue-300" : "text-gray-400"
+              )}
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent className="data-[state=open]:animate-slideDown data-[state=closed]:animate-slideUp overflow-hidden">
+            <div className="pl-6 pr-4 py-2 space-y-1.5 border-l border-blue-500/30 ml-4 mt-1">
+              {data.chunks.map((chunk, index: number) => {
+                const isChunkSelected =
+                  selectedChunk && chunk.content === selectedChunk.content;
+
+                return (
+                  <button
+                    key={index}
+                    className={cn(
+                      "cursor-pointer w-full text-left py-2 px-3 text-xs",
+                      "transition-all duration-200 rounded-md",
+                      "hover:bg-gray-700/60 hover:shadow-inner",
+                      isChunkSelected
+                        ? "bg-emerald-500/20 text-emerald-200 font-medium"
+                        : "text-slate-300 hover:text-blue-200"
+                    )}
+                    onClick={() => handleChunkSelect(chunk)}
+                  >
+                    <div className="truncate">
+                      {chunk.content.substring(0, 50)}...
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+      );
+    });
+  }, [
+    pdfData,
+    openPdfId,
+    selectedPDF,
+    selectedChunk,
+    handlePdfSelect,
+    handleChunkSelect,
+  ]);
 
   // Automatically collapse sidebar on small screens
   useEffect(() => {
@@ -58,69 +166,64 @@ const Sidebar: FunctionComponent<ISidebarProps> = () => {
     }
   }, [autoCollapse, width]);
 
-  return (
-    <aside
-      className={cn(
-        "flex flex-col transition-all duration-500 bg-primary text-primary-text border-r border-gray-700",
+  // Sidebar animation classes
+  const sidebarClasses = useMemo(
+    () =>
+      cn(
+        "flex flex-col transition-all duration-500 bg-gray-900 text-slate-100",
+        "border-r border-gray-700 shadow-lg",
         isCollapsed
           ? "w-0 opacity-0 overflow-hidden"
-          : "w-64 opacity-100 md:w-64 md:opacity-100"
-      )}
-    >
+          : "w-64 opacity-100 md:w-72 md:opacity-100"
+      ),
+    [isCollapsed]
+  );
+
+  return (
+    <aside className={sidebarClasses}>
       {/* Logo and Toggle Button */}
-      <div className="flex justify-between items-center h-[5dvh] border-b border-gray-700 p-4">
-        <h1 className="text-2xl font-bold ">Rematiq</h1>
+      <div className="flex justify-between items-center h-[5dvh] border-b border-gray-700 p-4 bg-gray-800/50">
+        <h1 className="text-2xl font-bold text-blue-300 transition-all duration-300 hover:text-blue-200">
+          Rematiq
+        </h1>
         {!isCollapsed && (
           <PrimaryButton
             onClick={toggleSidebar}
             aria-label="Collapse Sidebar"
             type="button"
-            className="p-2"
+            className="p-2 hover:bg-gray-700 hover:text-blue-300 transition-colors duration-200"
             text=""
           >
-            <GoSidebarExpand />
+            <GoSidebarExpand className="text-lg" />
           </PrimaryButton>
         )}
       </div>
 
       {/* Uploaded PDFs */}
-      <div className="flex-1 overflow-y-auto">
-        {pdfData && Object.entries(pdfData).length > 0 && (
+      <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent p-2">
+        {pdfData && Object.entries(pdfData).length > 0 ? (
           <div className="py-4">
-            <h3 className="px-4 text-xs uppercase text-blue-300 font-semibold mb-2">
+            <h3 className="px-4 text-xs uppercase text-blue-400 font-semibold mb-3 tracking-wider">
               YOUR PDFs
             </h3>
-            {Object.entries(pdfData).map(([id, data]) => (
-              <Collapsible key={id} className="group w-full mb-1">
-                <CollapsibleTrigger
-                  onClick={() => setSelectedPDF(data)}
-                  className="cursor-pointer flex items-center justify-between w-full px-4 py-2.5 text-sm font-medium text-slate-800 hover:bg-gray-700/50 transition-colors duration-200 rounded-md"
-                >
-                  <span className="truncate">{id}</span>
-                  <ChevronDown className="h-4 w-4 text-gray-400 transition-transform duration-300 ease-in-out group-data-[state=open]:rotate-180" />
-                </CollapsibleTrigger>
-                <CollapsibleContent className="animate-collapsible-down data-[state=closed]:animate-collapsible-up">
-                  <div className="pl-6 pr-4 py-2 space-y-1.5 border-l border-gray-700 ml-4 mt-1">
-                    {data.chunks.map((chunk, index) => (
-                      <button
-                        key={index}
-                        className="cursor-pointer w-full text-left py-1.5 px-2 text-xs text-emerald-900 hover:text-blue-300 hover:bg-gray-800/40 transition-colors duration-200 rounded truncate"
-                        onClick={() => selectChunk(chunk)}
-                      >
-                        {chunk.content.substring(0, 50)}...
-                      </button>
-                    ))}
-                  </div>
-                </CollapsibleContent>
-              </Collapsible>
-            ))}
+            <div className="space-y-1">{pdfList}</div>
+          </div>
+        ) : (
+          <div className="flex items-center justify-center h-full">
+            <p className="text-gray-500 text-sm italic">No PDFs available</p>
           </div>
         )}
       </div>
+
       {/* Logout Button */}
-      <div className="p-4 border-t border-gray-700">
-        <button className="w-full bg-red-500 text-white p-2 rounded hover:bg-red-600 transition-colors duration-200">
-          Logout
+      <div className="p-4 border-t border-gray-700 bg-gray-800/30">
+        <button
+          className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white p-2.5 rounded-lg 
+          hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-md
+          hover:shadow-red-500/20 flex items-center justify-center gap-2 font-medium"
+        >
+          <LogOut size={16} />
+          <span>Logout</span>
         </button>
       </div>
     </aside>
