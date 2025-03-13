@@ -44,6 +44,8 @@ export interface PdfTextContentData {
 const PdfViewer: FunctionComponent = () => {
   const { selectedPDF, selectedChunk } = usePDFStore();
 
+  const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
+
   const [pdfLocalData, setPdfLocalData] = useState<
     {
       pageNumber: number;
@@ -90,19 +92,22 @@ const PdfViewer: FunctionComponent = () => {
     }[] = [];
 
     const numPages = doc.numPages;
-    const normalizedToOriginalMap: number[] = [];
-    let originalText: string = "";
 
     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
       const content = await (await doc.getPage(pageNum)).getTextContent();
 
+      let pageOriginalText = ""; // Text content for this specific page
+      const pageNormalizedToOriginalMap: number[] = []; // Map for this specific page
+
       content.items.forEach((item) => {
         const text = item.str;
-        const offset = originalText.length;
-        originalText += text;
+        const offset = pageOriginalText.length;
+        pageOriginalText += text;
+
+        // Store offsets relative to the beginning of this page's text
         for (let i = 0; i < text.length; i++) {
           if (!/\s/.test(text[i])) {
-            normalizedToOriginalMap.push(offset + i);
+            pageNormalizedToOriginalMap.push(offset + i);
           }
         }
       });
@@ -110,16 +115,18 @@ const PdfViewer: FunctionComponent = () => {
       // Clean the text by removing potential page number artifacts at the beginning
       // This regex looks for a number (potentially the page number) at the start of the text
       // and removes it if found
-      const normalizedText = originalText.replace(/\s+/g, "");
+      const normalizedText = pageOriginalText;
 
       data.push({
         pageNumber: pageNum,
         content: normalizedText,
-        normalizedToOriginalMap,
+        normalizedToOriginalMap: pageNormalizedToOriginalMap,
       });
-
-      setPdfLocalData(data);
     }
+
+    setPdfLocalData(data);
+
+    setIsDocumentLoaded(true);
 
     const extractedContent = await extractPdfTextContent({ doc: doc, file });
     setPdfTextContent(extractedContent);
@@ -128,6 +135,8 @@ const PdfViewer: FunctionComponent = () => {
   // Trigger highlighting when the selected text chunk or PDF text content changes.
   useEffect(() => {
     const highlightMatch = async () => {
+      if (!isDocumentLoaded) return;
+
       if (!selectedChunk?.content || !pdfTextContent.normalizedText) return;
       console.log(
         "🚀 ~ highlightMatch ~ selectedChunk?.content:",
@@ -151,6 +160,12 @@ const PdfViewer: FunctionComponent = () => {
 
       const startIndex = found?.content.indexOf(formatSelectedContent);
 
+      console.log("🚀 ~ highlightMatch ~ found?.content:", found?.content);
+      console.log(
+        "🚀 ~ highlightMatch ~ pdf text:",
+        pdfTextContent.originalText
+      );
+
       if (!startIndex) return;
 
       const startOriginal = found.normalizedToOriginalMap[startIndex];
@@ -161,7 +176,7 @@ const PdfViewer: FunctionComponent = () => {
         ];
 
       // Extract the exact matching substring from the original text.
-      const exactMatch = pdfTextContent.originalText.substring(
+      const exactMatch = found.content.substring(
         startOriginal,
         endOriginal + 1
       );
@@ -184,7 +199,13 @@ const PdfViewer: FunctionComponent = () => {
       // });
     };
     highlightMatch();
-  }, [selectedChunk, pdfTextContent, searchPluginInstance, pdfLocalData]);
+  }, [
+    selectedChunk,
+    pdfTextContent,
+    searchPluginInstance,
+    pdfLocalData,
+    isDocumentLoaded,
+  ]);
 
   if (!selectedPDF) return <div>Select a PDF to view</div>;
 
