@@ -26,7 +26,6 @@ import "@react-pdf-viewer/page-navigation/lib/styles/index.css";
 import "@react-pdf-viewer/search/lib/styles/index.css";
 
 import { PdfLoadProgress } from "../components/Loaders/PDFLoader";
-import { extractPdfTextContent } from "../utils/helpers/extract-pdf-text-content";
 
 /**
  * Interface representing the extracted PDF text content and mapping.
@@ -49,17 +48,11 @@ const PdfViewer: FunctionComponent = () => {
   const [pdfLocalData, setPdfLocalData] = useState<
     {
       pageNumber: number;
+      originalContent: string;
+      normalizedContent: string;
       normalizedToOriginalMap: number[];
-      content: string;
     }[]
   >([]);
-  console.log("🚀 ~ pdfLocalData:", pdfLocalData);
-
-  const [pdfTextContent, setPdfTextContent] = useState<PdfTextContentData>({
-    originalText: "",
-    normalizedText: "",
-    normalizedToOriginalMap: [],
-  });
 
   // Initialize the page navigation plugin.
   const pageNavigationPluginInstance = pageNavigationPlugin();
@@ -83,100 +76,87 @@ const PdfViewer: FunctionComponent = () => {
    */
   const handleDocumentLoad = async ({
     doc,
-    file,
   }: DocumentLoadEvent): Promise<void> => {
     const data: {
       pageNumber: number;
-      content: string;
+      originalContent: string;
+      normalizedContent: string;
       normalizedToOriginalMap: number[];
     }[] = [];
 
     const numPages = doc.numPages;
 
     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-      const content = await (await doc.getPage(pageNum)).getTextContent();
+      const page = await doc.getPage(pageNum);
+      const content = await page.getTextContent();
 
-      let pageOriginalText = ""; // Text content for this specific page
-      const pageNormalizedToOriginalMap: number[] = []; // Map for this specific page
+      let originalText = "";
+      const normalizedMap: number[] = [];
 
       content.items.forEach((item) => {
         const text = item.str;
-        const offset = pageOriginalText.length;
-        pageOriginalText += text;
+        const offset = originalText.length;
+        originalText += text;
 
         // Store offsets relative to the beginning of this page's text
+        // Build normalized mapping
         for (let i = 0; i < text.length; i++) {
           if (!/\s/.test(text[i])) {
-            pageNormalizedToOriginalMap.push(offset + i);
+            normalizedMap.push(offset + i);
           }
         }
       });
 
       // Clean the text by removing potential page number artifacts at the beginning
       // This regex looks for a number (potentially the page number) at the start of the text
-      // and removes it if found
-      const normalizedText = pageOriginalText;
+      const normalizedText = originalText.replace(/\s+/g, "");
 
       data.push({
         pageNumber: pageNum,
-        content: normalizedText,
-        normalizedToOriginalMap: pageNormalizedToOriginalMap,
+        originalContent: originalText,
+        normalizedContent: normalizedText,
+        normalizedToOriginalMap: normalizedMap,
       });
     }
 
     setPdfLocalData(data);
 
     setIsDocumentLoaded(true);
-
-    const extractedContent = await extractPdfTextContent({ doc: doc, file });
-    setPdfTextContent(extractedContent);
   };
 
   // Trigger highlighting when the selected text chunk or PDF text content changes.
   useEffect(() => {
     const highlightMatch = async () => {
-      if (!isDocumentLoaded) return;
+      if (!isDocumentLoaded || !selectedChunk) return;
 
-      if (!selectedChunk?.content || !pdfTextContent.normalizedText) return;
       console.log(
         "🚀 ~ highlightMatch ~ selectedChunk?.content:",
         pdfLocalData
       );
 
-      const found = pdfLocalData.find(
-        (item) => item.pageNumber === selectedChunk.pageRange[0]
-      );
+      const targetPage = selectedChunk.pageRange[0];
+      const pageData = pdfLocalData.find((p) => p.pageNumber === targetPage);
 
-      if (!found) return;
+      console.log("logsss", targetPage, pageData);
 
-      const formatSelectedContent = selectedChunk.content
-        .replace(/^\s*\d+\s*/, "")
-        .replace(/\s+/g, "");
+      if (!pageData) return;
 
-      console.log(
-        "found a match",
-        found ? found.content.includes(formatSelectedContent) : false
-      );
+      // Prepare search content
+      const searchContent = selectedChunk.content.replace(/\s+/g, "");
+      const startIndex = pageData.normalizedContent.indexOf(searchContent);
 
-      const startIndex = found?.content.indexOf(formatSelectedContent);
+      if (startIndex === -1) {
+        console.warn("Text not found on target page");
+        return;
+      }
 
-      console.log("🚀 ~ highlightMatch ~ found?.content:", found?.content);
-      console.log(
-        "🚀 ~ highlightMatch ~ pdf text:",
-        pdfTextContent.originalText
-      );
-
-      if (!startIndex) return;
-
-      const startOriginal = found.normalizedToOriginalMap[startIndex];
-
+      // Calculate original positions
+      const startOriginal = pageData.normalizedToOriginalMap[startIndex];
       const endOriginal =
-        found.normalizedToOriginalMap[
-          startIndex + formatSelectedContent.length - 1
-        ];
+        pageData.normalizedToOriginalMap[startIndex + searchContent.length - 1];
 
-      // Extract the exact matching substring from the original text.
-      const exactMatch = found.content.substring(
+      // Extract exact match from original text
+      const exactMatch = pageData.originalContent.substring(
         startOriginal,
         endOriginal + 1
       );
@@ -184,28 +164,16 @@ const PdfViewer: FunctionComponent = () => {
       console.log("inner  exact match", exactMatch);
       console.log("inner ", startIndex, endOriginal);
 
-      // searchPluginInstance.clearHighlights();
-
-      const match = await searchPluginInstance.highlight(exactMatch);
-      if (match.length > 0) {
+      // Perform highlight
+      searchPluginInstance.clearHighlights();
+      const matches = await searchPluginInstance.highlight(exactMatch);
+      if (matches.length > 0) {
         searchPluginInstance.jumpToMatch(0);
       }
-      console.log("🚀 ~ highlightMatch ~ match:", match);
-
-      // await highlightMatchingText({
-      //   searchPluginInstance,
-      //   pdfTextContent,
-      //   selectedText: selectedChunk.content,
-      // });
     };
+
     highlightMatch();
-  }, [
-    selectedChunk,
-    pdfTextContent,
-    searchPluginInstance,
-    pdfLocalData,
-    isDocumentLoaded,
-  ]);
+  }, [selectedChunk, searchPluginInstance, pdfLocalData, isDocumentLoaded]);
 
   if (!selectedPDF) return <div>Select a PDF to view</div>;
 
