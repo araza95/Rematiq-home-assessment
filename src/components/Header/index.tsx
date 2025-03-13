@@ -14,7 +14,7 @@ const Header: FunctionComponent = () => {
   const { isCollapsed, toggleSidebar } = useSidebarStore();
 
   return (
-    <header className="h-[5vh] flex  items-center justify-between border-b border-slate-800 bg-slate-900 px-4 shadow-lg">
+    <header className="h-[7dvh] flex  items-center justify-between border-b border-slate-800 bg-gradient-to-b from-slate-900 to-slate-950 px-4 shadow-lg">
       <div className="flex items-center gap-4">
         {isCollapsed && (
           <PrimaryButton
@@ -22,7 +22,7 @@ const Header: FunctionComponent = () => {
             text=""
             onClick={toggleSidebar}
             aria-label="Expand Sidebar"
-            className="cursor-pointer bg-transparent"
+            className="cursor-pointer bg-transparent hover:bg-slate-900!"
           >
             <FaAngleDoubleRight className="text-lg" />
           </PrimaryButton>

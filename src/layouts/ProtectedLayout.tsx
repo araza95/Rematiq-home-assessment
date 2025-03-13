@@ -24,7 +24,7 @@ const ProtectedLayout: FunctionComponent = () => {
       <Sidebar />
       <div className="flex flex-col flex-1">
         <Header />
-        <main className="h-[] flex-1 overflow-auto bg-gradient-to-b from-slate-900 to-slate-950">
+        <main className="h-[95dvh] flex-1 overflow-auto bg-gradient-to-b from-slate-900 to-slate-950">
           <Outlet />
         </main>
       </div>
