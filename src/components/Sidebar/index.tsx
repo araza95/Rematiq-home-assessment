@@ -2,29 +2,29 @@
 import {
   FunctionComponent,
   useCallback,
+  useEffect,
   useMemo,
   useState,
-  useEffect,
 } from "react";
 
 // Store Imports
-import { useSidebarStore } from "../../store/sidebar-store";
 import { usePDFStore } from "../../store/pdf-store";
+import { useSidebarStore } from "../../store/sidebar-store";
 
 // Util Imports
 import { cn } from "../../utils/tailwind-cn";
 
 // React Icon Imports
-import { GoSidebarExpand } from "react-icons/go";
-import { ChevronDown, LogOut } from "lucide-react";
+import { ChevronDown } from "lucide-react";
+import { FaAngleDoubleLeft } from "react-icons/fa";
 
 // Component Imports
-import PrimaryButton from "../UI/Buttons/primary-button";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@radix-ui/react-collapsible";
+import PrimaryButton from "../UI/Buttons/primary-button";
 
 // Constants & Custom Hook Imports
 import { PDF_LISTS_PATH } from "../../constants";
@@ -170,7 +170,7 @@ const Sidebar: FunctionComponent<ISidebarProps> = () => {
   const sidebarClasses = useMemo(
     () =>
       cn(
-        "flex flex-col transition-all duration-500 bg-gray-900 text-slate-100",
+        "flex flex-col transition-all duration-500 bg-gradient-to-b from-slate-900 to-slate-950 text-slate-100",
         "border-r border-gray-700 shadow-lg",
         isCollapsed
           ? "w-0 opacity-0 overflow-hidden"
@@ -182,8 +182,8 @@ const Sidebar: FunctionComponent<ISidebarProps> = () => {
   return (
     <aside className={sidebarClasses}>
       {/* Logo and Toggle Button */}
-      <div className="flex justify-between items-center h-[5dvh] border-b border-gray-700 p-4 bg-gray-800/50">
-        <h1 className="text-2xl font-bold text-blue-300 transition-all duration-300 hover:text-blue-200">
+      <div className="flex justify-between items-center h-[5dvh] border-b border-gray-700 p-4 bg-gradient-to-b from-slate-900 to-slate-950">
+        <h1 className="text-2xl font-bold text-blue-300 transition-all duration-300 hover:text-blue-200 ">
           Rematiq
         </h1>
         {!isCollapsed && (
@@ -191,10 +191,10 @@ const Sidebar: FunctionComponent<ISidebarProps> = () => {
             onClick={toggleSidebar}
             aria-label="Collapse Sidebar"
             type="button"
-            className="p-2 hover:bg-gray-700 hover:text-blue-300 transition-colors duration-200"
+            className="bg-transparent cursor-pointer "
             text=""
           >
-            <GoSidebarExpand className="text-lg" />
+            <FaAngleDoubleLeft className="text-lg" />
           </PrimaryButton>
         )}
       </div>
@@ -213,18 +213,6 @@ const Sidebar: FunctionComponent<ISidebarProps> = () => {
             <p className="text-gray-500 text-sm italic">No PDFs available</p>
           </div>
         )}
-      </div>
-
-      {/* Logout Button */}
-      <div className="p-4 border-t border-gray-700 bg-gray-800/30">
-        <button
-          className="w-full bg-gradient-to-r from-red-500 to-red-600 text-white p-2.5 rounded-lg 
-          hover:from-red-600 hover:to-red-700 transition-all duration-300 shadow-md
-          hover:shadow-red-500/20 flex items-center justify-center gap-2 font-medium"
-        >
-          <LogOut size={16} />
-          <span>Logout</span>
-        </button>
       </div>
     </aside>
   );

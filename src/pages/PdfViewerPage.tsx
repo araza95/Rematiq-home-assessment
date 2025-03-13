@@ -66,21 +66,22 @@ const PdfViewer: React.FC = (): JSX.Element => {
   }
 
   return (
-    <div className="flex flex-col h-full border border-gray-300">
+    <div className="flex flex-col h-full">
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
         <PDFHeader CurrentPageLabel={CurrentPageLabel} />
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden w-[85%] m-auto">
           <Viewer
             initialPage={0}
             fileUrl={selectedPDF.path}
             plugins={plugins}
             enableSmoothScroll
             viewMode={ViewMode.SinglePage}
-            defaultScale={SpecialZoomLevel.PageFit}
+            defaultScale={SpecialZoomLevel.PageWidth}
             scrollMode={ScrollMode.Vertical}
             setRenderRange={setRenderRange}
             renderLoader={(progress) => <PdfLoadProgress progress={progress} />}
             onDocumentLoad={handleDocumentLoad}
+            theme="dark"
           />
         </div>
       </Worker>

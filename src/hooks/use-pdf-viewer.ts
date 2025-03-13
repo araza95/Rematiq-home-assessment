@@ -68,14 +68,15 @@ export const usePdfViewer = (): usePdfViewerHook => {
   // Create the search plugin with custom highlight styling
   const searchPluginRef = useRef(
     searchPlugin({
-      onHighlightKeyword: (props: OnHighlightKeyword) => {
+      onHighlightKeyword: ({ highlightEle }: OnHighlightKeyword) => {
         // Make highlights cyan with padding and a blending mode for better visibility
-        props.highlightEle.style.background = "#00FFFF"; // Cyan color
-        props.highlightEle.style.padding = "2px"; // Add padding around highlights
-        props.highlightEle.style.mixBlendMode = "multiply"; // Blend with underlying content
+        highlightEle.style.background = "#00FFFF"; // Cyan color
+        highlightEle.style.padding = "2px"; // Add padding around highlights
+        highlightEle.style.mixBlendMode = "multiply"; // Blend with underlying content
       },
     })
   );
+
   // Get the search plugin instance from the ref
   const searchPluginInstance = searchPluginRef.current;
 
