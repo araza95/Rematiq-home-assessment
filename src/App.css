@@ -20,10 +20,134 @@
   --radix-collapsible-content-height: 0px;
 }
 
-#root {
-  width: 100dvw;
+.rpv-core__inner-page {
+  background-color: #050b1e !important;
+}
+.rpv-core__viewer rpv-core__viewer--light{
+  background-image: linear-gradient(to bottom, #0f172b, #020617) !important;
 }
 
+/* Tailwind v4 global theme styles */
+
+@layer base {
+  /* Base styles */
+  :root {
+    --background: 230 14% 10%;
+    --foreground: 210 6% 93%;
+    
+    --primary: 213 94% 65%;
+    --primary-hover: 213 94% 70%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 229 33% 17%;
+    --secondary-foreground: 210 6% 93%;
+    
+    --accent: 160 84% 39%;
+    --accent-foreground: 0 0% 100%;
+    
+    --success: 142 76% 36%;
+    --error: 0 72% 51%;
+    --warning: 38 92% 50%;
+    
+    --border: 229 23% 18%;
+    --input: 229 23% 18%;
+    --ring: 213 94% 65%;
+    
+    --radius: 0.5rem;
+  }
+}
+
+@layer components {
+  /* Scrollbar styling */
+  .scrollbar-slim {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(229 23% 23%) transparent;
+  }
+  
+  .scrollbar-slim::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  
+  .scrollbar-slim::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-slim::-webkit-scrollbar-thumb {
+    background-color: hsl(229 23% 23%);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-slim::-webkit-scrollbar-thumb:hover {
+    background-color: hsl(229 23% 30%);
+  }
+  
+  /* Modern card styling */
+  .card-modern {
+    @apply bg-slate-900 border border-slate-800 rounded-lg p-4 shadow-lg;
+    box-shadow: 0 4px 20px -5px rgba(0, 0, 0, 0.25), 
+                0 2px 10px -5px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* PDF content styling */
+  .pdf-content {
+    @apply bg-white text-slate-950 rounded-lg shadow-xl;
+    box-shadow: 0 4px 25px -5px rgba(0, 0, 0, 0.1), 
+                0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  }
+  
+  /* Highlight styling */
+  .highlight-cyan {
+    @apply bg-cyan-300/40 px-1 py-0.5 rounded text-slate-950;
+    mix-blend-mode: multiply;
+  }
+  
+  /* Animated transitions */
+  .slide-down {
+    animation: slideDown 0.3s ease-out forwards;
+  }
+  
+  .slide-up {
+    animation: slideUp 0.3s ease-out forwards;
+  }
+  
+  @keyframes slideDown {
+    from { height: 0; opacity: 0; }
+    to { height: var(--radix-collapsible-content-height); opacity: 1; }
+  }
+  
+  @keyframes slideUp {
+    from { height: var(--radix-collapsible-content-height); opacity: 1; }
+    to { height: 0; opacity: 0; }
+  }
+}
+
+@layer utilities {
+  /* Gradient text */
+  .text-gradient {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-cyan-400;
+  }
+  
+  /* Glass effect */
+  .glass-effect {
+    @apply bg-slate-800/50 backdrop-blur-md border border-slate-700/50;
+  }
+  
+  /* Elevation helper classes */
+  .elevation-1 {
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  }
+  
+  .elevation-2 {
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  }
+  
+  .elevation-3 {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.19), 0 6px 6px rgba(0, 0, 0, 0.23);
+  }
+}
+
+/*
 @layer base {
   * {
     @apply transition-colors duration-200;
@@ -41,39 +165,48 @@
     @apply font-display;
   }
 }
-
-@layer utilities {
-  .animate-collapsible-down {
-    overflow: hidden;
-    animation: collapsibleDown 300ms cubic-bezier(0.4, 0, 0.2, 1);
+@keyframes slideDown {
+  from {
+    height: 0;
+    opacity: 0;
   }
-
-  .animate-collapsible-up {
-    overflow: hidden;
-    animation: collapsibleUp 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  to {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
   }
+}
 
-  @keyframes collapsibleDown {
-    from {
-      height: 0;
-      opacity: 0;
-    }
-    to {
-      height: var(--radix-collapsible-content-height);
-      opacity: 1;
-    }
+@keyframes slideUp {
+  from {
+    height: var(--radix-collapsible-content-height);
+    opacity: 1;
   }
+  to {
+    height: 0;
+    opacity: 0;
+  }
+}
 
-  @keyframes collapsibleUp {
-    from {
-      height: var(--radix-collapsible-content-height);
-      opacity: 1;
-    }
-    to {
-      height: 0;
-      opacity: 0;
-    }
-  }
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out;
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
+/* Optional: Add this for a nicer scrollbar */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 5px;
+}
+
+.scrollbar-thumb-gray-700::-webkit-scrollbar-thumb {
+  background: #4a5568;
+  border-radius: 5px;
+}
+
+.scrollbar-track-transparent::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 /* :root {
@@ -183,4 +316,4 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
-} */
+} */ */

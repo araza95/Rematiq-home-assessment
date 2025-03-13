@@ -20,11 +20,11 @@ import Sidebar from "../components/Sidebar";
  */
 const ProtectedLayout: FunctionComponent = () => {
   return (
-    <div className="flex h-screen w-full">
+    <div className="flex h-screen w-full overflow-hidden bg-slate-950 text-slate-200">
       <Sidebar />
-      <div className="flex flex-col flex-1 bg-primary text-primary-text">
+      <div className="flex flex-col flex-1">
         <Header />
-        <main className="h-[95dvh] flex-1 overflow-auto">
+        <main className="h-[] flex-1 overflow-auto bg-gradient-to-b from-slate-900 to-slate-950">
           <Outlet />
         </main>
       </div>

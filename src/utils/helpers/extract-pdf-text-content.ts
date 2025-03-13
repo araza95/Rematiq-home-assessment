@@ -76,7 +76,7 @@ export const extractPdfTextContent = async ({
   const normalizedToOriginalMap: number[] = [];
 
   // Loop through each page's content.
-  pageContents.forEach((page, pageIndex) => {
+  pageContents.forEach((page) => {
     page.items.forEach((_) => {
       const item = _ as ExtendedTextItemType;
       const text = item.str;
