@@ -42,7 +42,6 @@ export interface PdfTextContentData {
  */
 const PdfViewer: FunctionComponent = () => {
   const { selectedPDF, selectedChunk } = usePDFStore();
-
   const [isDocumentLoaded, setIsDocumentLoaded] = useState(false);
 
   const [pdfLocalData, setPdfLocalData] = useState<
@@ -54,16 +53,15 @@ const PdfViewer: FunctionComponent = () => {
     }[]
   >([]);
 
-  // Initialize the page navigation plugin.
+  // Initialize plugins
   const pageNavigationPluginInstance = pageNavigationPlugin();
   const { CurrentPageLabel } = pageNavigationPluginInstance;
 
-  // Create the search plugin instance once.
   const searchPluginInstance = useRef(
     searchPlugin({
       onHighlightKeyword: (props: OnHighlightKeyword) => {
         props.highlightEle.style.background = "#00FFFF";
-        props.highlightEle.style.padding = "5px";
+        props.highlightEle.style.padding = "2px";
         props.highlightEle.style.mixBlendMode = "multiply";
       },
     })
@@ -74,16 +72,10 @@ const PdfViewer: FunctionComponent = () => {
    *
    * @param event - The document load event containing the PDF document.
    */
-  const handleDocumentLoad = async ({
-    doc,
-  }: DocumentLoadEvent): Promise<void> => {
-    const data: {
-      pageNumber: number;
-      originalContent: string;
-      normalizedContent: string;
-      normalizedToOriginalMap: number[];
-    }[] = [];
 
+  // Document load handler
+  const handleDocumentLoad = async ({ doc }: DocumentLoadEvent) => {
+    const data = [];
     const numPages = doc.numPages;
 
     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
@@ -98,7 +90,6 @@ const PdfViewer: FunctionComponent = () => {
         const offset = originalText.length;
         originalText += text;
 
-        // Store offsets relative to the beginning of this page's text
         // Build normalized mapping
         for (let i = 0; i < text.length; i++) {
           if (!/\s/.test(text[i])) {
@@ -107,8 +98,6 @@ const PdfViewer: FunctionComponent = () => {
         }
       });
 
-      // Clean the text by removing potential page number artifacts at the beginning
-      // This regex looks for a number (potentially the page number) at the start of the text
       const normalizedText = originalText.replace(/\s+/g, "");
 
       data.push({
@@ -120,11 +109,9 @@ const PdfViewer: FunctionComponent = () => {
     }
 
     setPdfLocalData(data);
-
     setIsDocumentLoaded(true);
   };
 
-  // Trigger highlighting when the selected text chunk or PDF text content changes.
   useEffect(() => {
     const highlightMatch = async () => {
       if (!isDocumentLoaded || !selectedChunk) return;
@@ -133,40 +120,69 @@ const PdfViewer: FunctionComponent = () => {
         "🚀 ~ highlightMatch ~ selectedChunk?.content:",
         pdfLocalData
       );
+      let remaining = "";
+      const result = [];
+      for (const page of selectedChunk.pageRange) {
+        const targetPage = page;
+        const pageData = pdfLocalData.find((p) => p.pageNumber === targetPage);
 
-      const targetPage = selectedChunk.pageRange[0];
-      const pageData = pdfLocalData.find((p) => p.pageNumber === targetPage);
+        console.log("logsss", targetPage, pageData);
 
-      console.log("logsss", targetPage, pageData);
+        if (!pageData) return;
 
-      if (!pageData) return;
+        // Prepare search content
+        let searchContent = selectedChunk.content.replace(/\s+/g, "");
+        let startIndex = -1;
+        if (remaining.length) {
+          startIndex = pageData.normalizedContent.indexOf(remaining);
+          searchContent = remaining;
+        } else {
+          startIndex = pageData.normalizedContent.indexOf(searchContent);
+        }
+        if (startIndex === -1 && selectedChunk.pageRange.length > 1) {
+          // Not matched might be split in two pages
+          let matched = searchContent[0];
+          let i = 0;
+          for (i = 0; i < searchContent.length; i++) {
+            const found = pageData.normalizedContent.indexOf(matched);
+            if (found != -1) matched += searchContent[i + 1];
+            else break;
+          }
+          remaining = searchContent.slice(i);
+          console.log("remaining", remaining);
+          console.log("matched", matched);
+          matched = matched.slice(0, matched.length - 1);
+          searchContent = matched;
+          startIndex = pageData.normalizedContent.indexOf(matched);
+          // startIndex = 1167
+          console.log("startIndex", startIndex);
+          if (startIndex === -1) return;
+          console.log("searchContent", searchContent, searchContent.length);
+          console.warn("Text not found on target page");
+          // return;
+        }
 
-      // Prepare search content
-      const searchContent = selectedChunk.content.replace(/\s+/g, "");
-      const startIndex = pageData.normalizedContent.indexOf(searchContent);
+        // Calculate original positions
+        const startOriginal = pageData.normalizedToOriginalMap[startIndex];
+        // console.log('startOriginal', startOriginal)
+        const endOriginal =
+          pageData.normalizedToOriginalMap[
+            startIndex + searchContent.length - 1
+          ];
 
-      if (startIndex === -1) {
-        console.warn("Text not found on target page");
-        return;
+        // Extract exact match from original text
+        const exactMatch = pageData.originalContent.substring(
+          startOriginal,
+          endOriginal + 1
+        );
+        result.push(exactMatch);
+        console.log("inner  exact match", exactMatch);
+        // console.log("inner ", startIndex, endOriginal);
       }
-
-      // Calculate original positions
-      const startOriginal = pageData.normalizedToOriginalMap[startIndex];
-      const endOriginal =
-        pageData.normalizedToOriginalMap[startIndex + searchContent.length - 1];
-
-      // Extract exact match from original text
-      const exactMatch = pageData.originalContent.substring(
-        startOriginal,
-        endOriginal + 1
-      );
-
-      console.log("inner  exact match", exactMatch);
-      console.log("inner ", startIndex, endOriginal);
 
       // Perform highlight
       searchPluginInstance.clearHighlights();
-      const matches = await searchPluginInstance.highlight(exactMatch);
+      const matches = await searchPluginInstance.highlight(result);
       if (matches.length > 0) {
         searchPluginInstance.jumpToMatch(0);
       }
