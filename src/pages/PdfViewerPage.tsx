@@ -48,6 +48,9 @@ import DocumentProcessingLoader from "../components/Loaders/DocumentProcessingLo
  *   <PdfViewer />
  * </PDFProvider>
  *
+ * @issues - https://github.com/mozilla/pdf.js/issues/3768#issuecomment-36468349
+ * @issues - https://github.com/react-pdf-viewer/react-pdf-viewer/issues/1571
+ *
  * @see [react-pdf-viewer documentation](https://react-pdf-viewer.dev) for plugin configuration details
  * @see [pdfjs-dist worker setup](https://react-pdf-viewer.dev/docs/basic-usage/) for worker requirements
  */

@@ -1,4 +1,4 @@
-import { DocumentLoadEvent } from "@react-pdf-viewer/core";
+import { DocumentLoadEvent, PdfJs } from "@react-pdf-viewer/core";
 
 /**
  * Interface representing a page's text content data
@@ -35,15 +35,15 @@ export class PageDataService {
     const numPages = doc.numPages;
 
     for (let pageNum = 1; pageNum <= numPages; pageNum++) {
-      const page = await doc.getPage(pageNum);
-      const content = await page.getTextContent();
+      const page: PdfJs.Page = await doc.getPage(pageNum);
+      const content: PdfJs.PageTextContent = await page.getTextContent();
 
-      let originalText = "";
+      let originalText: string = "";
       const normalizedMap: number[] = [];
 
       content.items.forEach((item) => {
-        const text = item.str;
-        const offset = originalText.length;
+        const text: string = item.str;
+        const offset: number = originalText.length;
         originalText += text;
 
         // Build normalized mapping - store position of non-whitespace characters
@@ -54,7 +54,7 @@ export class PageDataService {
         }
       });
 
-      const normalizedText = originalText.replace(/\s+/g, "");
+      const normalizedText: string = originalText.replace(/\s+/g, "");
 
       data.push({
         pageNumber: pageNum,
@@ -79,8 +79,8 @@ export class PageDataService {
     selectedChunk: SelectedChunk
   ): Promise<string[]> {
     const result: string[] = [];
-    let remaining = "";
-    const searchContent = selectedChunk.content.replace(/\s+/g, "");
+    const searchContent: string = selectedChunk.content.replace(/\s+/g, "");
+    let remaining: string = "";
 
     // Process each page in the range
     for (const pageNumber of selectedChunk.pageRange) {

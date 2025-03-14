@@ -109,6 +109,7 @@ export const usePdfViewer = (): usePdfViewerHook => {
         setDocumentLoaded(false);
       }
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [] // No dependencies means this function is created once
   );
 
