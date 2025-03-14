@@ -1,7 +1,7 @@
 // src/tests/components/Sidebar.test.tsx
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import Sidebar from "./index";
+import Sidebar from "../components/Sidebar/index";
 
 // 1) Mock your custom hook that fetches PDFs
 vi.mock("../../hooks/use-fetch.ts", async (importOriginal) => ({

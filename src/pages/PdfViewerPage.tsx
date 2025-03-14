@@ -78,7 +78,10 @@ const PdfViewer: React.FC = (): JSX.Element => {
   // If no PDF is selected, show empty state
   if (!selectedPDF) {
     return (
-      <div className="p-4 text-center text-gray-600 h-full flex items-center justify-center text-[2.5rem] font-[initial]">
+      <div
+        className="p-4 text-center text-gray-600 h-full flex items-center justify-center text-[2.5rem] font-[initial]"
+        data-testid="no-pdf-selected"
+      >
         Select a PDF to view
       </div>
     );

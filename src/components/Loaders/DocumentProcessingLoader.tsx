@@ -23,7 +23,10 @@ const DocumentProcessingLoader: React.FC<DocumentLoaderProps> = ({ pdfId }) => {
   }
 
   return (
-    <div className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center">
+    <div
+      className="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center"
+      data-testid="document-processing-loader"
+    >
       <div className="bg-slate-800 p-6 rounded-lg shadow-lg max-w-md w-full text-center">
         <Loader2 className="h-10 w-10 animate-spin text-blue-500 mx-auto mb-4" />
         <h3 className="text-lg font-semibold text-slate-100 mb-2">
