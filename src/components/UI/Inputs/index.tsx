@@ -2,7 +2,7 @@
 import { FunctionComponent, ReactNode } from "react";
 
 // Util Imports
-import { cn } from "../../../utils/tailwind-cn";
+import { cn } from "../../../lib/utils";
 
 interface ICustomInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

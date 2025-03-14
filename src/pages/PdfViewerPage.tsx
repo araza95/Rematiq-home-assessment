@@ -18,7 +18,7 @@ import "@react-pdf-viewer/page-navigation/lib/styles/index.css";
 
 // Component Imports
 import { PdfLoadProgress } from "../components/Loaders/PDFLoader";
-import PDFHeader from "../components/PdfViewer/PDFHeader";
+import PDFHeader from "../components/Header/PDFHeader";
 
 // Hook Imports
 import { usePdfViewer } from "../hooks/use-pdf-viewer";
@@ -75,10 +75,7 @@ const PdfViewer: React.FC = (): JSX.Element => {
   // If no PDF is selected, show empty state
   if (!selectedPDF) {
     return (
-      <div
-        className="p-4 text-center text-gray-600 h-full flex items-center justify-center text-[2.5rem] font-[initial]
-      "
-      >
+      <div className="p-4 text-center text-gray-600 h-full flex items-center justify-center text-[2.5rem] font-[initial]">
         Select a PDF to view
       </div>
     );
@@ -94,7 +91,7 @@ const PdfViewer: React.FC = (): JSX.Element => {
       )}
       <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
         <PDFHeader CurrentPageLabel={CurrentPageLabel} />
-        <div className="flex-1 overflow-hidden w-[85%] m-auto">
+        <div className="flex-1 overflow-hidden w-[95%] md:w-[85%] m-auto">
           <Viewer
             initialPage={0}
             fileUrl={selectedPDF.path}

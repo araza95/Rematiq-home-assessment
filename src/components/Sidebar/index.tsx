@@ -1,12 +1,12 @@
 // Sidebar.tsx
 import React, { FunctionComponent, useEffect, useMemo } from "react";
-import { PDF_LISTS_PATH } from "../../constants";
+import { PDF_LISTS_PATH } from "../../config/constants";
 import usePdfFetch from "../../hooks/use-fetch";
 import { useDimension } from "../../hooks/useWindow";
 import { usePDFStore } from "../../store/pdf-store";
 import { useSidebarStore } from "../../store/sidebar-store";
 import { PDFChunk, PDFData, PDFDatum } from "../../types/pdf-response";
-import { cn } from "../../utils/tailwind-cn";
+import { cn } from "../../lib/utils";
 import PdfList from "./PDFList";
 import SidebarHeader from "./SidebarHeader";
 

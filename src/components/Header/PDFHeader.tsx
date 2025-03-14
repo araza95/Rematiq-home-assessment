@@ -7,7 +7,7 @@ const PDFHeader: React.FC<{
   }>;
 }> = memo(({ CurrentPageLabel }) => {
   return (
-    <div className="w-[85%] m-auto flex items-center justify-center py-3 px-2 bg-gradient-to-b from-slate-900 to-slate-950">
+    <div className="w-[95%] md:w-[85%] m-auto flex items-center justify-center py-3 px-2 bg-gradient-to-b from-slate-900 to-slate-950">
       <CurrentPageLabel>
         {(props: RenderCurrentPageLabelProps) => (
           <Fragment>

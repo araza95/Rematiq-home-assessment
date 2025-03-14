@@ -7,7 +7,7 @@ import {
 import { ChevronDown } from "lucide-react";
 import { FunctionComponent } from "react";
 import { PDFChunk, PDFDatum } from "../../types/pdf-response";
-import { cn } from "../../utils/tailwind-cn";
+import { cn } from "../../lib/utils";
 import ChunkItem from "./ChunkItem";
 
 interface PdfItemProps {
