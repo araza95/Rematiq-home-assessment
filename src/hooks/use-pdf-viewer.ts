@@ -15,7 +15,10 @@ import { usePDFStore } from "../store/pdf-store";
 import { PageData, usePdfViewerHook } from "../types/pdf-types";
 
 // Utility Imports
-import { PageDataService } from "../utils/app/pdf-utils";
+import {
+  extractPageData,
+  findTextMatchesInPages,
+} from "../utils/app/pdf-utils";
 
 /**
  * @description A custom hook that manages PDF viewer functionality including page navigation, text search,
@@ -94,7 +97,7 @@ export const usePdfViewer = (): usePdfViewerHook => {
     async ({ doc }: DocumentLoadEvent): Promise<void> => {
       try {
         // Extract text and other data from each page of the PDF
-        const data = await PageDataService.extractPageData(doc);
+        const data = await extractPageData(doc);
 
         // Store the extracted data for later use
         setPdfLocalData(data);
@@ -138,10 +141,7 @@ export const usePdfViewer = (): usePdfViewerHook => {
 
     try {
       // Search for text matches across all pages
-      const result = await PageDataService.findTextMatchesInPages(
-        pdfLocalData,
-        selectedChunk
-      );
+      const result = await findTextMatchesInPages(pdfLocalData, selectedChunk);
 
       // Remove any existing highlighted text
       searchPluginInstance.clearHighlights();
